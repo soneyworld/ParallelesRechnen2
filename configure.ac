@@ -43,7 +43,7 @@ AC_ARG_ENABLE(openmp,
         [
                 CFLAGS="$CFLAGS -fopenmp"
                 CXXFLAGS="$CXXFLAGS -fopenmp"
-                AC_DEFINE([_OPENMP], [], [Define to enable extra debugging output.])
+                AC_DEFINE([OPENMP], [], [Define to enable openmp support.])
         ])
 
 

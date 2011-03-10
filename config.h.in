@@ -40,6 +40,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to enable openmp support. */
+#undef OPENMP
+
 /* Name of package */
 #undef PACKAGE
 
@@ -66,9 +69,6 @@
 
 /* Version number of package */
 #undef VERSION
-
-/* Define to enable extra debugging output. */
-#undef _OPENMP
 
 /* Define to rpl_malloc if the replacement function should be used. */
 #undef malloc

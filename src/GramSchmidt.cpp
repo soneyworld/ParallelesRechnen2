@@ -18,7 +18,7 @@
 #define W(i,j) w[(i)*lda+(j)]
 #define V(i,j) v[(i)*lda+(j)]
 
-#ifdef _OPENMP
+#ifdef OPENMP
 #include <omp.h>
 #endif
 
@@ -79,7 +79,9 @@ void initOrthoMatrix(NUMBER *v, unsigned int length, unsigned int lda) {
 		random = (rand() + 1.0) / (double) RAND_MAX;
 		random *= 2.0;
 #endif
+#ifdef OPENMP
 #pragma omp parallel for
+#endif
 		for (int j = 0; j < length; j++) {
 			if (i == j) {
 				V(i,j) = 1;
@@ -154,9 +156,9 @@ int main(int argc, char **argv) {
 	NUMBER *v = w;
 	NUMBER *scalar_v = (NUMBER*) malloc(sizeof(NUMBER) * MATRIXDIMENSION);
 	printf("start init:\n");
-	printf("sizeof double: %d\n", sizeof(double));
-	printf("sizeof float: %d\n", sizeof(float));
-	printf("using precision: %d\n", sizeof(NUMBER));
+	printf("sizeof double: %d\n", (int)sizeof(double));
+	printf("sizeof float: %d\n", (int)sizeof(float));
+	printf("using precision: %d\n", (int)sizeof(NUMBER));
 	initOrthoMatrix(v, MATRIXDIMENSION, lda);
 	printf("start gs\n");
 
