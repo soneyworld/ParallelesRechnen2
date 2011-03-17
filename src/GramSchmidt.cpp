@@ -28,12 +28,15 @@
 
 NUMBER dot(NUMBER *a, NUMBER *b, unsigned int length) {
 	//	multiplication++;
-	NUMBER sum = a[0] * b[0];
-	for (int i = 1; i < length; i++) {
-		//	addition++;
-		//	multiplication++;
+	NUMBER sum;
+#ifdef OPENMP
+	int i,kerne = omp_get_num_threads();
+#pragma omp parallel for private(i) reduction(+:sum) num_threads(kerne)
+#else
+	int i;
+#endif
+	for (i = 0; i < length; i++)
 		sum += a[i] * b[i];
-	}
 	return sum;
 }
 

@@ -17,4 +17,8 @@ stamp-h1
 depcomp
 install-sh
 missing
+src/Demo1.o
+src/Dot.o
+src/dot
+src/ompdemo1
 
