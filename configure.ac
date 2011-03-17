@@ -39,8 +39,8 @@ AC_ARG_ENABLE(debug,
 		CXXFLAGS="$CXXFLAGS -O3 -ffast-math -mfpmath=sse+387"
 	])
 AC_ARG_ENABLE(openmp,
- 	[AC_HELP_STRING([--enable-openmp], [enable parallel execution with posix threads and openmp [default=no]]) ],
-        [
+ 	[AC_HELP_STRING([--disable-openmp], [enable parallel execution with posix threads and openmp [default=yes]]) ],
+        [],[
                 CFLAGS="$CFLAGS -fopenmp"
                 CXXFLAGS="$CXXFLAGS -fopenmp"
                 AC_DEFINE([OPENMP], [], [Define to enable openmp support.])
