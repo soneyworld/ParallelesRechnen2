@@ -12,8 +12,8 @@
 #include "GramSchmidt.h"
 #include <cstring>
 
-#define ORTHOGONAL
-#define RANDOMMATRIX
+//#define ORTHOGONAL
+//#define RANDOMMATRIX
 
 #define MATRIXDIMENSION 10
 #define W(i,j) w[(i)*lda+(j)]
@@ -26,10 +26,9 @@
 //int addition = 0;
 //int multiplication = 0;
 //int division = 0;
-
 NUMBER dot(NUMBER *a, NUMBER *b, unsigned int length) {
 	//	multiplication++;
-	NUMBER sum;
+	NUMBER sum = 0.0;
 	int i;
 	for (i = 0; i < length; i++)
 		sum += a[i] * b[i];
@@ -37,16 +36,16 @@ NUMBER dot(NUMBER *a, NUMBER *b, unsigned int length) {
 }
 
 #ifdef OPENMP
-void gs(NUMBER *v, NUMBER *scalar_v, unsigned int length, unsigned int lda) {
+void gs(NUMBER *w, NUMBER *scalar_v, unsigned int length, unsigned int lda) {
+	//	NUMBER *v =(NUMBER*) malloc(sizeof(NUMBER) * length * length);
+	NUMBER *v = w;
 	int i, j, k;
-//	NUMBER *w =(float*) malloc(sizeof(NUMBER) * length * length);
-	NUMBER *w = v;
 	NUMBER scalar;
 	NUMBER temp;
 #ifdef ORTHOGONAL
 	NUMBER ortho = 0;
 #endif
-//	memcpy(w, v, length * length * sizeof(NUMBER));
+	//	memcpy(w, v, length * length * sizeof(NUMBER));
 	for (i = 0; i < (length * length); i++) {
 		for (k = i; k > 0; k--) {
 			//	division++;
@@ -69,8 +68,8 @@ void gs(NUMBER *v, NUMBER *scalar_v, unsigned int length, unsigned int lda) {
 #endif
 		scalar_v[i] = dot(&V(i,0), &V(i,0), length);
 	}
-//	memcpy(v,w,length*length*sizeof(NUMBER));
-//	free(w);
+	//	memcpy(v,w,length*length*sizeof(NUMBER));
+	//	free(w);
 }
 #else
 void gs(NUMBER *w, NUMBER *scalar_v, unsigned int length, unsigned int lda) {
@@ -144,10 +143,10 @@ long calcCPUOperations(int n, int add, int mult, int div) {
 #ifdef ORTHOGONAL
 	double sqrt = div + n * div;
 	double result = n * (scalarproduct + sqrt) + (littlegaus * (scalarproduct
-			+ div + n * 2 * (add + mult)));
+					+ div + n * 2 * (add + mult)));
 #else
 	double result = n * (scalarproduct) + (littlegaus * (scalarproduct + div
-					+ n * (add + mult)));
+			+ n * (add + mult)));
 #endif
 	return (long) result;
 }
@@ -180,7 +179,7 @@ void printOperations(double time) {
 }
 
 int main(int argc, char **argv) {
-#ifdef _OPENMP
+#ifdef OPENMP
 	printf("OPENMP is activated\n");
 #endif
 	double time;
@@ -201,15 +200,15 @@ int main(int argc, char **argv) {
 	 V(1,0) = 0;
 	 V(1,1) = 0;
 	 V(1,2) = 1;*/
-	/*printMatrix(v, MATRIXDIMENSION, lda);
-	 printf("\n");*/
+	printMatrix(v, MATRIXDIMENSION, lda);
+	printf("\n");
 
 	//gs(w, scalar_v, MATRIXDIMENSION, lda);
 	time = getTimeInSeconds();
 	//for(int i=0;i<100;i++)
 	gs(w, scalar_v, MATRIXDIMENSION, lda);
 	time = getTimeInSeconds() - time;
-	//printMatrix(v, MATRIXDIMENSION, lda);
+	printMatrix(v, MATRIXDIMENSION, lda);
 	//printf("%2.0f\n", dot(&V(0,0), &V(1,0), MATRIXDIMENSION));
 	printOperations(time);
 	free(w);//free(w)==free(v)
