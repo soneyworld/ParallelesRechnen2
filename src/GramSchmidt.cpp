@@ -10,11 +10,12 @@
 #include "config.h"
 #include "Benchmark.h"
 #include "GramSchmidt.h"
+#include <cstring>
 
 #define ORTHOGONAL
 #define RANDOMMATRIX
 
-#define MATRIXDIMENSION 1000
+#define MATRIXDIMENSION 10
 #define W(i,j) w[(i)*lda+(j)]
 #define V(i,j) v[(i)*lda+(j)]
 
@@ -29,17 +30,49 @@
 NUMBER dot(NUMBER *a, NUMBER *b, unsigned int length) {
 	//	multiplication++;
 	NUMBER sum;
-#ifdef OPENMP
-	int i,kerne = omp_get_num_threads();
-#pragma omp parallel for private(i) reduction(+:sum) num_threads(kerne)
-#else
 	int i;
-#endif
 	for (i = 0; i < length; i++)
 		sum += a[i] * b[i];
 	return sum;
 }
 
+#ifdef OPENMP
+void gs(NUMBER *v, NUMBER *scalar_v, unsigned int length, unsigned int lda) {
+	int i, j, k;
+//	NUMBER *w =(float*) malloc(sizeof(NUMBER) * length * length);
+	NUMBER *w = v;
+	NUMBER scalar;
+	NUMBER temp;
+#ifdef ORTHOGONAL
+	NUMBER ortho = 0;
+#endif
+//	memcpy(w, v, length * length * sizeof(NUMBER));
+	for (i = 0; i < (length * length); i++) {
+		for (k = i; k > 0; k--) {
+			//	division++;
+			scalar = dot(&W(i,0), &V(k-1,0), length) / scalar_v[k - 1];
+			for (j = 0; j < length; j++) {
+				//			addition++;
+				//			multiplication++;
+				temp = W(i,j) - scalar * V(k,j);
+				V(i,j) = temp;
+#ifdef ORTHOGONAL
+				ortho += temp * temp;
+#endif
+			}
+		}
+#ifdef ORTHOGONAL
+		ortho = 1 / sqrt(ortho);
+		for (j = 0; j < length; j++) {
+			V(i,j) = V(i,j) * ortho;
+		}
+#endif
+		scalar_v[i] = dot(&V(i,0), &V(i,0), length);
+	}
+//	memcpy(v,w,length*length*sizeof(NUMBER));
+//	free(w);
+}
+#else
 void gs(NUMBER *w, NUMBER *scalar_v, unsigned int length, unsigned int lda) {
 	NUMBER *v = w;
 	int i, j, k;
@@ -63,15 +96,15 @@ void gs(NUMBER *w, NUMBER *scalar_v, unsigned int length, unsigned int lda) {
 			}
 		}
 #ifdef ORTHOGONAL
-		ortho = sqrt(ortho);
+		ortho = 1/sqrt(ortho);
 		for (j = 0; j < length; j++) {
-			V(i,j) = V(i,j) / ortho;
+			V(i,j) = V(i,j) * ortho;
 		}
 #endif
 		scalar_v[i] = dot(&V(i,0), &V(i,0), length);
 	}
 }
-
+#endif
 void initOrthoMatrix(NUMBER *v, unsigned int length, unsigned int lda) {
 #ifdef RANDOMMATRIX
 	srand(time(0));
@@ -81,9 +114,6 @@ void initOrthoMatrix(NUMBER *v, unsigned int length, unsigned int lda) {
 #ifdef RANDOMMATRIX
 		random = (rand() + 1.0) / (double) RAND_MAX;
 		random *= 2.0;
-#endif
-#ifdef OPENMP
-#pragma omp parallel for
 #endif
 		for (int j = 0; j < length; j++) {
 			if (i == j) {
@@ -159,9 +189,9 @@ int main(int argc, char **argv) {
 	NUMBER *v = w;
 	NUMBER *scalar_v = (NUMBER*) malloc(sizeof(NUMBER) * MATRIXDIMENSION);
 	printf("start init:\n");
-	printf("sizeof double: %d\n", (int)sizeof(double));
-	printf("sizeof float: %d\n", (int)sizeof(float));
-	printf("using precision: %d\n", (int)sizeof(NUMBER));
+	printf("sizeof double: %d\n", (int) sizeof(double));
+	printf("sizeof float: %d\n", (int) sizeof(float));
+	printf("using precision: %d\n", (int) sizeof(NUMBER));
 	initOrthoMatrix(v, MATRIXDIMENSION, lda);
 	printf("start gs\n");
 

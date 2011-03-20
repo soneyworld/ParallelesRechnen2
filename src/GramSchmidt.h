@@ -6,7 +6,7 @@
 
 #ifndef GRAMSCHMIDT_H_
 #define GRAMSCHMIDT_H_
-#define NUMBER double
+#define NUMBER float
 
 NUMBER dot(NUMBER *a, NUMBER *b, unsigned int length);
 
