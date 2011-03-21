@@ -12,7 +12,7 @@
 #include "GramSchmidt.h"
 #include <cstring>
 
-//#define ORTHOGONAL
+#define ORTHOGONAL
 //#define RANDOMMATRIX
 
 #define MATRIXDIMENSION 10
@@ -43,10 +43,12 @@ void gs(NUMBER *w, NUMBER *scalar_v, unsigned int length, unsigned int lda) {
 	NUMBER scalar;
 	NUMBER temp;
 #ifdef ORTHOGONAL
-	NUMBER ortho = 0;
+	NUMBER ortho;
 #endif
+	scalar_v[0] = dot(&V(0,0), &V(0,0), length);
 	//	memcpy(w, v, length * length * sizeof(NUMBER));
-	for (i = 0; i < (length * length); i++) {
+	for (i = 1; i < length ; i++) {
+		ortho = 0.0;
 		for (k = i; k > 0; k--) {
 			//	division++;
 			scalar = dot(&W(i,0), &V(k-1,0), length) / scalar_v[k - 1];
