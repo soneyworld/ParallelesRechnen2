@@ -1,1 +1,3 @@
+=== UNFINISHED AND UNUSABLE ===
+
 A little project to parallize Gram-Schmidt algorithm and Lanczos algorithm with openmp on a multiprocessor computer
